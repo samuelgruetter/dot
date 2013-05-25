@@ -1,5 +1,10 @@
+
+This is a fork of [https://github.com/namin/dot] to play around
+with the DOT code.
+
+
 Dependent Object Types (DOT)
-============================
+----------------------------
 
 The DOT calculus proposes a new foundation for Scala's type system.
 
