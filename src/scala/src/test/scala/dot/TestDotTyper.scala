@@ -113,4 +113,42 @@ class TestDotTyper extends FunSuite with DotTyper {
       join(decls1, decls2)
     }
   }
+  
+  //// subtyping tests added by sam:
+  // not sure why some of them fail: is it wrong usage of methods or is it a bug or is it both?
+  
+  def isSub(tp1: Type, tp2: Type): Boolean = {
+    (for (_ <- sub(tp1, tp2)) yield ()).findExactlyOne(None) match {
+      case TyperSuccess(_) => true
+      case TyperFailure(msg) => {
+        println("msg is: " + msg)
+        false
+      }
+    }
+  }
+  
+  test("Bottom<:Top") { expectResult { true } { isSub(Bottom, Top) } }
+  
+  test("Top not subtype of Bottom") { expectResult { false } { isSub(Top, Bottom) } }
+  
+  test("<:refl") { expectResult { true } {
+    val t = Tsel(Var(Name("p")),AbstractTypeLabel("S")) 
+    isSub(t, t) 
+  }}
+  
+  test("<:Top") { expectResult { true } {
+    val t = Tsel(Var(Name("p")),AbstractTypeLabel("S")) 
+    isSub(t, Top) 
+  }}
+  
+  test("Bot<:") { expectResult { true } {
+    val t = Tsel(Var(Name("p")),AbstractTypeLabel("S")) 
+    isSub(Bottom, t) 
+  }}
+  
+  test("not <: Bot") { expectResult { true } {
+    val t = Tsel(Var(Name("p")),AbstractTypeLabel("S")) 
+    isSub(t, Bottom) 
+  }}
+  
 }
