@@ -159,6 +159,13 @@ trait DotTyper extends StandardTyperMonad with DotTyperSyntax with DotNominalSyn
   }
   def intersectDecl = mergeDecl(union, intersect) _
   def unionDecl = mergeDecl(intersect, union) _
+  
+  def meet0(ds1: Dcls, ds2: Dcls): Dcls = inDebugMode({
+    val res = meet0(ds1, ds2)
+    debug("meet(" + ds1 + "----" + ds2 + ") ==== " + res)
+    res
+  })
+  
   //  intersection of declaration sets
   def meet(ds1: Dcls, ds2: Dcls): Dcls = (ds1, ds2) match {
     case (BottomDecls, _) => BottomDecls
@@ -244,6 +251,12 @@ trait DotTyper extends StandardTyperMonad with DotTyperSyntax with DotNominalSyn
     }
   }
 
+  def sub0(tp1: Type, tp2: Type): TyperMonad[Unit] = inDebugMode({
+    val res = sub0(tp1, tp2)
+    debug(tp1.toString + "---" + tp2.toString + "===" + res.toString)
+    res
+  })
+  
   def sub(tp1: Type, tp2: Type): TyperMonad[Unit] = some(List(
     /*refl*/    (for(_ <- check(tp1===tp2); _ <- wfe(tp1))                                                   yield()),
     /*<:-top*/  (for(_ <- check(tp2===Top); _ <- wfe(tp1))                                                   yield()),
@@ -341,7 +354,10 @@ trait DotTyperSyntax extends MetaVariablesNominal with DotSyntax {
       case (Union(a1, b1), Union(a2, b2)) => a1===a2 && b1===b2
       case (Top, Top) => true
       case (Bottom, Bottom) => true
-      case _ => false
+      case _ => {
+        debug("non-equal-types(" + tp1 + "===/===" + tp2 + ")")
+        false
+      }
     }
   }
 
