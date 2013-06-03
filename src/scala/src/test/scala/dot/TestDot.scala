@@ -213,21 +213,17 @@ class TestDot extends FunSuite with DotParsing with DotTyper {
   test("TooRecursive") { expectResult("stuck in infinite derivation"){checkfail(
       "val x = new Top {x => l: x.L; L: Bot .. x.l.L} (l=x); x")
   }}
-    
-  // tests added by sam:
-  
-  val input1 = """
-      val w = new Top { y => 
-        f: Top{a => S: Bot..Top; l: a.S} -> Top 
-        id: Top -> Top 
-      } ( 
-        f(a) = a 
+
+  test("MethodInitScope") { expectResult(Top){check(
+    """
+      val w = new Top { y =>
+        f: Top{a => S: Bot..Top; l: a.S} -> Top
+        id: Top -> Top
+      } (
+        f(a) = a.l
         id(x) = x
       );
       w.id(w)
     """
-    
-  test("TestTest")        { expectResult(Top){check(input1)}}
-  test("pathtype <: Top") { expectResult(Top){check(input1.replaceAllLiterally("f(a) = a", "f(a) = a.l"))}}
-    
+)}}
 }
